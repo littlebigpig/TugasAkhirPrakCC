@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WarnetSkarngAph - Register</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Spectral:wght@300;400;500;600;700&family=Karla:wght@300;400;500;600;700&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Karla', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            display: flex;
+            width: 100%;
+            max-width: 1200px;
+            height: 650px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .welcome-section {
+            flex: 1;
+            padding: 60px 50px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            color: white;
+            position: relative;
+        }
+
+        .welcome-title {
+            font-family: 'Spectral', serif;
+            font-size: 4rem;
+            font-weight: 300;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .welcome-title .typewriter-w {
+            font-family: 'Courier Prime', monospace;
+            font-size: 4.5rem;
+            font-weight: 700;
+        }
+
+        .welcome-title::after {
+            content: "";
+            position: absolute;
+            left: -20px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 40px;
+            height: 40px;
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            border-radius: 50%;
+            animation: spin 10s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: translateY(-50%) rotate(0deg); }
+            to { transform: translateY(-50%) rotate(360deg); }
+        }
+
+        .welcome-subtitle {
+            font-family: 'Spectral', serif;
+            font-size: 2.5rem;
+            font-weight: 300;
+            margin-left: 120px;
+            margin-top: -20px;
+            font-style: italic;
+            opacity: 0.9;
+        }
+
+        .welcome-subtitle .typewriter-g {
+            font-family: 'Courier Prime', monospace;
+            font-size: 3rem;
+            font-weight: 700;
+        }
+
+        .welcome-text {
+            font-family: 'Karla', sans-serif;
+            margin-top: 40px;
+            line-height: 1.6;
+            font-size: 1rem;
+            opacity: 0.8;
+        }
+
+        .highlight {
+            color: #00d4ff;
+            font-weight: 600;
+        }
+
+        .register-section {
+            width: 450px;
+            background: linear-gradient(135deg, rgba(173, 216, 230, 0.9) 0%, rgba(135, 206, 235, 0.9) 100%);
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            overflow-y: auto;
+        }
+
+        .register-section::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            background: linear-gradient(135deg, #b8e6ff 0%, #a0d8ef 100%);
+            z-index: -1;
+        }
+
+        .register-title {
+            font-family: 'Spectral', serif;
+            font-size: 2.5rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            font-family: 'Karla', sans-serif;
+            display: block;
+            margin-bottom: 6px;
+            color: #34495e;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .form-input {
+            font-family: 'Karla', sans-serif;
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid rgba(52, 73, 94, 0.1);
+            border-radius: 10px;
+            font-size: 0.95rem;
+            background: rgba(255, 255, 255, 0.8);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #3498db;
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #7f8c8d;
+            font-size: 1rem;
+        }
+
+        .register-button {
+            font-family: 'Karla', sans-serif;
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .register-button:hover {
+            background: linear-gradient(135deg, #2980b9 0%, #21618c 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(52, 152, 219, 0.3);
+        }
+
+        .login-link {
+            font-family: 'Karla', sans-serif;
+            text-align: center;
+            margin-top: 20px;
+            color: #34495e;
+            font-size: 0.9rem;
+        }
+
+        .login-link a {
+            color: #3498db;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        .login-link a:hover {
+            color: #2980b9;
+        }
+
+        .footer-brand {
+            font-family: 'Spectral', serif;
+            position: absolute;
+            bottom: 20px;
+            right: 40px;
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .password-strength {
+            font-size: 0.8rem;
+            margin-top: 5px;
+            color: #7f8c8d;
+        }
+
+        .strength-weak { color: #e74c3c; }
+        .strength-medium { color: #f39c12; }
+        .strength-strong { color: #27ae60; }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+                height: auto;
+                max-width: 400px;
+            }
+
+            .welcome-section {
+                padding: 40px 30px;
+                text-align: center;
+            }
+
+            .welcome-title {
+                font-size: 2.5rem;
+            }
+
+            .welcome-title::after {
+                display: none;
+            }
+
+            .welcome-subtitle {
+                font-size: 1.8rem;
+                margin-left: 0;
+                margin-top: 10px;
+            }
+
+            .register-section {
+                width: 100%;
+                padding: 40px 30px;
+            }
+
+            .footer-brand {
+                position: relative;
+                bottom: auto;
+                right: auto;
+                text-align: center;
+                margin-top: 20px;
+            }
+        }
+
+        /* Animation */
+        .container {
+            animation: slideIn 0.8s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="welcome-section">
+            <div class="welcome-title"><span class="typewriter-w">W</span>elcome</div>
+            <div class="welcome-subtitle"><span class="typewriter-g">G</span>amers</div>
+            <div class="welcome-text">
+                Nggak mau buang waktu cari PC kosong di warnet? Pakai 
+                <span class="highlight">WarnetSkarngAph</span> ! Kami bikin pemesanan PC warnet jadi gampang 
+                banget. Cukup beberapa klik, PC impianmu langsung siap dipakai. Anti 
+                ribet, anti nunggu, dan pastinya bikin pengalaman nge-warnet makin 
+                asyik. <span class="highlight">Waktunya nge-warnet tanpa drama !</span>
+            </div>
+        </div>
+        
+        <div class="register-section">
+            <h2 class="register-title">Register</h2>
+            
+            <form id="registerForm">
+                <div class="form-group">
+                    <label class="form-label" for="username">username</label>
+                    <div class="input-wrapper">
+                        <input 
+                            type="text" 
+                            id="username" 
+                            name="username" 
+                            class="form-input" 
+                            placeholder="username"
+                            required
+                        >
+                        <span class="input-icon">👤</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="email">email</label>
+                    <div class="input-wrapper">
+                        <input 
+                            type="email" 
+                            id="email" 
+                            name="email" 
+                            class="form-input" 
+                            placeholder="example@gmail.com"
+                            required
+                        >
+                        <span class="input-icon">📧</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="password">password</label>
+                    <div class="input-wrapper">
+                        <input 
+                            type="password" 
+                            id="password" 
+                            name="password" 
+                            class="form-input" 
+                            placeholder="password"
+                            required
+                        >
+                        <span class="input-icon">🔒</span>
+                    </div>
+                    <div id="passwordStrength" class="password-strength"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="confirmPassword">confirm password</label>
+                    <div class="input-wrapper">
+                        <input 
+                            type="password" 
+                            id="confirmPassword" 
+                            name="confirmPassword" 
+                            class="form-input" 
+                            placeholder="password"
+                            required
+                        >
+                        <span class="input-icon">🔒</span>
+                    </div>
+                </div>
+                
+                <button type="submit" class="register-button">Register</button>
+            </form>
+            
+            <div class="login-link">
+                Sudah punya akun ? 
+                <a href="#" id="loginLink">Masuk disini</a>
+            </div>
+            
+            <div class="footer-brand">
+                WarnetSkarngAph
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Password strength checker
+        function checkPasswordStrength(password) {
+            const strengthElement = document.getElementById('passwordStrength');
+            let strength = 0;
+            let message = '';
+            
+            if (password.length >= 8) strength++;
+            if (/[a-z]/.test(password)) strength++;
+            if (/[A-Z]/.test(password)) strength++;
+            if (/[0-9]/.test(password)) strength++;
+            if (/[^A-Za-z0-9]/.test(password)) strength++;
+            
+            if (password.length === 0) {
+                strengthElement.textContent = '';
+                strengthElement.className = 'password-strength';
+            } else if (strength <= 2) {
+                message = 'Password lemah';
+                strengthElement.className = 'password-strength strength-weak';
+            } else if (strength <= 3) {
+                message = 'Password sedang';
+                strengthElement.className = 'password-strength strength-medium';
+            } else {
+                message = 'Password kuat';
+                strengthElement.className = 'password-strength strength-strong';
+            }
+            
+            strengthElement.textContent = message;
+        }
+        
+        // Password strength listener
+        document.getElementById('password').addEventListener('input', function() {
+            checkPasswordStrength(this.value);
+        });
+        
+        // Form submission handler
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            // Validation
+            if (username.trim() === '' || email.trim() === '' || password.trim() === '' || confirmPassword.trim() === '') {
+                alert('Mohon isi semua kolom!');
+                return;
+            }
+            
+            if (password !== confirmPassword) {
+                alert('Password dan konfirmasi password tidak cocok!');
+                return;
+            }
+            
+            if (password.length < 6) {
+                alert('Password minimal 6 karakter!');
+                return;
+            }
+            
+            // Email validation
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                alert('Format email tidak valid!');
+                return;
+            }
+            
+            // Simulate registration process
+            const registerButton = document.querySelector('.register-button');
+            const originalText = registerButton.textContent;
+            
+            registerButton.textContent = 'Mendaftar...';
+            registerButton.disabled = true;
+            
+            setTimeout(() => {
+                registerButton.textContent = originalText;
+                registerButton.disabled = false;
+                alert('Registrasi berhasil! Selamat datang di WarnetSkarngAph');
+                // Redirect to login or dashboard
+                // window.location.href = 'login.html';
+            }, 2000);
+        });
+        
+        // Login link handler
+        document.getElementById('loginLink').addEventListener('click', function(e) {
+            e.preventDefault();
+            alert('Redirecting to login page...');
+            // Redirect to login page
+            // window.location.href = 'login.html';
+        });
+        
+        // Add interactive effects
+        const inputs = document.querySelectorAll('.form-input');
+        inputs.forEach(input => {
+            input.addEventListener('focus', function() {
+                this.parentElement.style.transform = 'scale(1.02)';
+            });
+            
+            input.addEventListener('blur', function() {
+                this.parentElement.style.transform = 'scale(1)';
+            });
+        });
+        
+        // Real-time password confirmation check
+        document.getElementById('confirmPassword').addEventListener('input', function() {
+            const password = document.getElementById('password').value;
+            const confirmPassword = this.value;
+            
+            if (confirmPassword && password !== confirmPassword) {
+                this.style.borderColor = '#e74c3c';
+            } else if (confirmPassword && password === confirmPassword) {
+                this.style.borderColor = '#27ae60';
+            } else {
+                this.style.borderColor = 'rgba(52, 73, 94, 0.1)';
+            }
+        });
+    </script>
+</body>
+</html>

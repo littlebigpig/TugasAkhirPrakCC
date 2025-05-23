@@ -1,0 +1,461 @@
+:root {
+    --primary-blue: #1e3a8a;
+    --secondary-blue: #1e40af;
+    --accent-blue: #3b82f6;
+    --success-green: #10b981;
+    --warning-yellow: #f59e0b;
+    --danger-red: #ef4444;
+    --dark-gray: #1f2937;
+    --medium-gray: #374151;
+    --light-gray: rgba(255, 255, 255, 0.1);
+    --border-gray: rgba(255, 255, 255, 0.2);
+    --text-white: white;
+    --text-muted: rgba(255, 255, 255, 0.7);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Karla', sans-serif;
+    background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 50%, var(--accent-blue) 100%);
+    min-height: 100vh;
+    color: var(--text-white);
+    line-height: 1.5;
+}
+
+/* Header Styles */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 40px;
+    background: rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(10px);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.logo {
+    font-family: 'Spectral', serif;
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.header-controls {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+.sort-dropdown {
+    background: var(--light-gray);
+    border: 1px solid var(--border-gray);
+    border-radius: 8px;
+    padding: 8px 15px;
+    color: var(--text-white);
+    font-family: inherit;
+    cursor: pointer;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.sort-dropdown:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.btn {
+    padding: 10px 20px;
+    border-radius: 8px;
+    border: none;
+    font-family: inherit;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-secondary {
+    background: rgba(255, 255, 255, 0.2);
+    color: var(--text-white);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* Main Content */
+.main-content {
+    padding: 30px 40px;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 20px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* Card Styles */
+.card {
+    background: var(--light-gray);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    padding: 20px;
+    border: 1px solid var(--border-gray);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    min-height: 120px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+}
+
+.card-number {
+    font-size: 48px;
+    font-weight: 700;
+    font-family: 'Spectral', serif;
+    color: var(--text-white);
+    margin-bottom: 5px;
+}
+
+.card-status {
+    font-size: 14px;
+    font-weight: 500;
+    text-transform: lowercase;
+}
+
+.card-time {
+    font-size: 12px;
+    opacity: 0.8;
+    margin-top: 5px;
+}
+
+/* Status variants */
+.card.kosong {
+    background: rgba(75, 85, 99, 0.4);
+}
+
+.card.dipakai {
+    background: rgba(14, 165, 233, 0.6);
+    border-color: rgba(14, 165, 233, 0.8);
+}
+
+.card.perbaikan {
+    background: rgba(161, 128, 44, 0.6);
+    border-color: rgba(161, 128, 44, 0.8);
+}
+
+/* Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(5px);
+    z-index: 1000;
+    animation: fadeIn 0.3s ease;
+}
+
+.modal.active {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.modal-content {
+    background: linear-gradient(135deg, var(--dark-gray) 0%, var(--medium-gray) 100%);
+    border-radius: 20px;
+    padding: 30px;
+    width: 90%;
+    max-width: 500px;
+    border: 1px solid var(--border-gray);
+    position: relative;
+    animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+    from { 
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to { 
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--border-gray);
+}
+
+.modal-title {
+    font-family: 'Spectral', serif;
+    font-size: 24px;
+    font-weight: 600;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    color: var(--text-white);
+    font-size: 24px;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.3s;
+    line-height: 1;
+}
+
+.close-btn:hover {
+    opacity: 1;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    font-size: 14px;
+}
+
+.form-input {
+    width: 100%;
+    padding: 12px;
+    background: var(--light-gray);
+    border: 1px solid var(--border-gray);
+    border-radius: 8px;
+    color: var(--text-white);
+    font-family: inherit;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.form-input:focus {
+    border-color: var(--accent-blue);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.form-input::placeholder {
+    color: var(--text-muted);
+}
+
+.billing-section {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.time-input {
+    background: var(--light-gray);
+    border: 1px solid var(--border-gray);
+    border-radius: 8px;
+    color: var(--text-white);
+    padding: 8px 12px;
+    font-family: inherit;
+    outline: none;
+    width: 80px; /* Lebar yang cukup untuk HH:MM:SS */
+}
+
+.time-input:focus {
+    border-color: var(--accent-blue);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.modal-actions {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+}
+
+.action-btn {
+    padding: 12px;
+    border: none;
+    border-radius: 10px;
+    font-family: inherit;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-kosong {
+    background: var(--success-green);
+    color: var(--text-white);
+}
+
+.btn-kosong:hover {
+    background: #059669;
+}
+
+.btn-dipakai {
+    background: var(--accent-blue);
+    color: var(--text-white);
+}
+
+.btn-dipakai:hover {
+    background: #2563eb;
+}
+
+.btn-perbaikan {
+    background: var(--warning-yellow);
+    color: var(--text-white);
+}
+
+.btn-perbaikan:hover {
+    background: #d97706;
+}
+
+.btn-stop {
+    background: var(--danger-red);
+    color: var(--text-white);
+}
+
+.btn-stop:hover {
+    background: #dc2626;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .header {
+        padding: 15px 20px;
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .main-content {
+        padding: 20px;
+    }
+    
+    .grid {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 15px;
+    }
+    
+    .card {
+        padding: 15px;
+    }
+    
+    .card-number {
+        font-size: 36px;
+    }
+    
+    .modal-actions {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 480px) {
+    .header-controls {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .sort-dropdown, .btn {
+        width: 100%;
+    }
+    
+    .grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+.pc-card.dipakai {
+    background-color: #d4edda;
+}
+
+.pc-card.perbaikan {
+    background-color: #f8d7da;
+}
+
+.pc-card.kosong {
+    background-color: #fff3cd;
+}
+
+.card-username {
+    font-size: 14px;
+    font-weight: 500;
+    margin-top: 5px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.card-timer {
+    font-size: 14px; /* Sedikit lebih kecil untuk menampilkan format waktu yang lebih panjang */
+    font-weight: 700;
+    margin-top: 5px;
+    font-family: monospace;
+    background: rgba(0, 0, 0, 0.2);
+    padding: 3px 6px;
+    border-radius: 4px;
+    display: inline-block;
+}
+
+.card.dipakai .card-timer {
+    color: #ffffff;
+}
+
+.card.dipakai .card-timer {
+    color: #ffffff;
+    background: rgba(0, 0, 0, 0.2);
+    padding: 3px 6px;
+    border-radius: 4px;
+    display: inline-block;
+}
+
+.time-input-group {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  
+  .time-unit {
+    width: 50px;
+    background: var(--light-gray);
+    border: 1px solid var(--border-gray);
+    border-radius: 6px;
+    padding: 8px;
+    color: var(--text-white);
+    text-align: center;
+    font-family: monospace;
+  }
+  
+  .time-unit:focus {
+    border-color: var(--accent-blue);
+    outline: none;
+  }
+  
+  .time-input-group span {
+    font-weight: bold;
+  }

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WarnetSkarngAph - Dashboard Admin</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="header">
+    <h1 class="logo">WarnetSkarngAph</h1>
+    <div class="header-controls">
+      <select class="sort-dropdown">
+        <option value="default">Sort by</option>
+        <option value="status">Status</option>
+        <option value="number">Number</option>
+        <option value="time">Time</option>
+      </select>
+      <button class="btn btn-secondary">History</button>
+      <button class="btn btn-secondary">Log out</button>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <div class="grid" id="pcGrid"></div>
+  </main>
+
+  <div id="pcModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title" id="modalTitle">PC Details</h2>
+        <button class="close-btn" onclick="closeModal()" aria-label="Close modal">&times;</button>
+      </div>
+      <form id="pcForm">
+        <div class="form-group">
+          <label for="usernameInput" class="form-label">Username</label>
+          <input type="text" class="form-input" id="usernameInput" placeholder="Enter username" />
+        </div>
+        <div class="billing-section">
+            <span>Billing Time</span>
+            <div class="time-input-group">
+              <input type="number" class="time-unit" id="hours" min="0" max="23" placeholder="HH" value="1">
+              <span>:</span>
+              <input type="number" class="time-unit" id="minutes" min="0" max="59" placeholder="MM" value="0">
+              <span>:</span>
+              <input type="number" class="time-unit" id="seconds" min="0" max="59" placeholder="SS" value="0">
+            </div>
+          </div>
+        <div class="modal-actions">
+          <button type="button" class="action-btn btn-kosong" onclick="setStatus('kosong')">Kosong</button>
+          <button type="button" class="action-btn btn-dipakai" onclick="setStatus('dipakai')">Dipakai</button>
+          <button type="button" class="action-btn btn-perbaikan" onclick="setStatus('perbaikan')">Perbaikan</button>
+          <button type="button" class="action-btn btn-stop" onclick="setStatus('stop')">Stop</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="card.js"></script>
+</body>
+</html>
