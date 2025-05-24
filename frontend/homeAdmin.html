@@ -4,18 +4,19 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>WarnetSkarngAph - Dashboard Admin</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="admin_style.css" />
 </head>
 <body>
   <header class="header">
     <h1 class="logo">WarnetSkarngAph</h1>
     <div class="header-controls">
       <select class="sort-dropdown">
-        <option value="default">Sort by</option>
-        <option value="status">Status</option>
-        <option value="number">Number</option>
-        <option value="time">Time</option>
-      </select>
+        <option value="default">Nomer PC</option>
+        <option value="kosong">Kosong</option>
+        <option value="dipakai">Dipakai</option>
+        <option value="perbaikan">Perbaikan</option>
+        <option value="time">Billing</option>
+    </select>
       <button class="btn btn-secondary">History</button>
       <button class="btn btn-secondary">Log out</button>
     </div>
@@ -46,11 +47,10 @@
               <input type="number" class="time-unit" id="seconds" min="0" max="59" placeholder="SS" value="0">
             </div>
           </div>
-        <div class="modal-actions">
-          <button type="button" class="action-btn btn-kosong" onclick="setStatus('kosong')">Kosong</button>
-          <button type="button" class="action-btn btn-dipakai" onclick="setStatus('dipakai')">Dipakai</button>
-          <button type="button" class="action-btn btn-perbaikan" onclick="setStatus('perbaikan')">Perbaikan</button>
-          <button type="button" class="action-btn btn-stop" onclick="setStatus('stop')">Stop</button>
+          <div class="modal-actions">
+            <button type="button" class="action-btn btn-dipakai" onclick="setStatus('dipakai')">Dipakai</button>
+            <button type="button" class="action-btn btn-perbaikan" onclick="setStatus('perbaikan')">Perbaikan</button>
+            <button type="button" class="action-btn btn-stop" onclick="setStatus('stop')">Stop</button>
         </div>
       </form>
     </div>

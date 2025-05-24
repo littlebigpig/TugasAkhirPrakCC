@@ -4,6 +4,7 @@ const DEFAULT_STATUS = 'kosong';
 
 // PC Data Model
 let pcData = [];
+let originalPCData = [];
 
 // DOM Elements
 const pcGrid = document.getElementById('pcGrid');
@@ -35,6 +36,7 @@ function initializePCData() {
             time: ''
         });
     }
+    originalPCData = [...pcData]; // Simpan salinan data asli
 }
 
 function renderPCCards() {
@@ -178,6 +180,7 @@ function timeToMs(timeStr) {
 function setStatus(status) {
     if (!currentPC) return;
 
+    // This is the first declaration of pcIndex
     const pcIndex = pcData.findIndex(pc => pc.id === currentPC);
     if (pcIndex === -1) return;
 
@@ -204,6 +207,12 @@ function setStatus(status) {
             pc.username = '';
             pc.time = '';
             break;
+    }
+    
+    // Just reuse the variable or use a different name
+    const originalIndex = originalPCData.findIndex(pc => pc.id === currentPC);
+    if (originalIndex !== -1) {
+        originalPCData[originalIndex] = {...pcData.find(pc => pc.id === currentPC)};
     }
 
     renderPCCards();
@@ -248,9 +257,46 @@ function startCountdown(cardElement, durationMs) {
     cardElement.dataset.intervalId = intervalId;
 }
 
-// Helper function for sorting (you need to implement this)
 function sortPCs(sortBy) {
-    // Implement your sorting logic here
-    console.log('Sorting by:', sortBy);
+    let sortedData = [...originalPCData]; // Selalu gunakan data asli sebagai dasar
+    
+    switch(sortBy) {
+        case 'default':
+            // Urutkan berdasarkan nomor PC (1-30)
+            sortedData.sort((a, b) => a.id - b.id);
+            break;
+            
+        case 'kosong':
+            // Filter hanya PC dengan status kosong
+            sortedData = sortedData.filter(pc => pc.status === 'kosong');
+            break;
+            
+        case 'dipakai':
+            // Filter hanya PC dengan status dipakai
+            sortedData = sortedData.filter(pc => pc.status === 'dipakai');
+            break;
+            
+        case 'perbaikan':
+            // Filter hanya PC dengan status perbaikan
+            sortedData = sortedData.filter(pc => pc.status === 'perbaikan');
+            break;
+            
+        case 'time':
+            // Filter hanya PC dipakai dan urutkan berdasarkan waktu tersisa
+            sortedData = sortedData.filter(pc => pc.status === 'dipakai');
+            sortedData.sort((a, b) => {
+                const timeA = timeToMs(a.time);
+                const timeB = timeToMs(b.time);
+                return timeA - timeB; // Yang paling cepat habis muncul pertama
+            });
+            break;
+            
+        default:
+            // Default: urutkan berdasarkan nomor PC
+            sortedData.sort((a, b) => a.id - b.id);
+    }
+    
+    // Perbarui pcData dengan data yang sudah difilter/diurutkan
+    pcData = sortedData;
     renderPCCards();
 }
