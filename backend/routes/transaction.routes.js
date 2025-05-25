@@ -1,6 +1,7 @@
 import express from 'express';
 import TransactionController from '../controllers/transaction.controller.js';
 import verifyToken from '../middlewares/auth.middleware.js';
+import checkAdmin from '../middlewares/role.middleware.js';
 
 const router = express.Router();
 
@@ -10,6 +11,6 @@ router.use(verifyToken);
 router.post('/', TransactionController.createTransaction);
 
 // List semua transaksi
-router.get('/', TransactionController.getAllTransactions);
+router.get('/', checkAdmin, TransactionController.getAllTransactions);
 
 export default router;
