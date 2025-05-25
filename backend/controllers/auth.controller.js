@@ -16,7 +16,7 @@ const AuthController = {
       const newUser = await User.create({
         username,
         password: hashedPassword,
-        role: role || 'user'
+        role: role || 'user'  // Default to 'user' if role not provided
       });
 
       res.status(201).json({ message: 'Registrasi berhasil', user: newUser });
@@ -35,13 +35,19 @@ const AuthController = {
       const match = await bcrypt.compare(password, user.password);
       if (!match) return res.status(401).json({ message: 'Password salah' });
 
+      // Create JWT token and include role in the payload
       const accessToken = jwt.sign(
         { id: user.id, role: user.role },
         process.env.ACCESS_TOKEN_SECRET,
         { expiresIn: '1h' }
       );
 
-      res.status(200).json({ message: 'Login berhasil', accessToken });
+      // Send token and role in response
+      res.status(200).json({
+        message: 'Login berhasil',
+        accessToken,
+        role: user.role  // Include role in the response
+      });
     } catch (err) {
       res.status(500).json({ message: 'Gagal login', error: err.message });
     }

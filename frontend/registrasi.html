@@ -49,21 +49,6 @@
                     </div>
                     
                     <div class="form-group">
-                        <label class="form-label" for="email">email</label>
-                        <div class="input-wrapper">
-                            <input 
-                                type="email" 
-                                id="email" 
-                                name="email" 
-                                class="form-input" 
-                                placeholder="example@gmail.com" 
-                                required
-                            >
-                            <span class="input-icon"><i class="fas fa-envelope"></i></span>
-                        </div>
-                    </div>
-                    
-                    <div class="form-group">
                         <label class="form-label" for="password">password</label>
                         <div class="input-wrapper password-wrapper">
                             <input 
@@ -161,16 +146,15 @@
         });
         
         // Form submission handler
-        document.getElementById('registerForm').addEventListener('submit', function(e) {
+        document.getElementById('registerForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
             const username = document.getElementById('username').value;
-            const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
             const confirmPassword = document.getElementById('confirmPassword').value;
             
             // Validation
-            if (username.trim() === '' || email.trim() === '' || password.trim() === '' || confirmPassword.trim() === '') {
+            if (username.trim() === '' || password.trim() === '' || confirmPassword.trim() === '') {
                 alert('Mohon isi semua kolom!');
                 return;
             }
@@ -185,13 +169,6 @@
                 return;
             }
             
-            // Email validation
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(email)) {
-                alert('Format email tidak valid!');
-                return;
-            }
-            
             // Simulate registration process
             const registerButton = document.querySelector('.login-button');
             const originalText = registerButton.textContent;
@@ -199,13 +176,30 @@
             registerButton.textContent = 'Mendaftar...';
             registerButton.disabled = true;
             
-            setTimeout(() => {
+            try {
+                const response = await fetch('http://localhost:5000/api/auth/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const result = await response.json();
+
+                if (response.status === 201) {
+                    alert('Registrasi berhasil! Selamat datang di WarnetSkarngAph');
+                    window.location.href = 'login.html'; // Redirect ke halaman login setelah registrasi berhasil
+                } else {
+                    alert(result.message || 'Registrasi gagal!');
+                }
+            } catch (error) {
+                console.error('Error during registration:', error);
+                alert('Terjadi kesalahan. Silakan coba lagi.');
+            } finally {
                 registerButton.textContent = originalText;
                 registerButton.disabled = false;
-                alert('Registrasi berhasil! Selamat datang di WarnetSkarngAph');
-                // Redirect to login or dashboard
-                // window.location.href = 'login.html';
-            }, 2000);
+            }
         });
         
         // Real-time password confirmation check

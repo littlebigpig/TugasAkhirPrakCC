@@ -3,9 +3,8 @@ POST http://localhost:5000/api/auth/register
 Content-Type: application/json
 
 {
-  "username": "admin",
-  "password": "admin",
-  "role": "admin"
+  "username": "k1ller",
+  "password": "123"
 }
 
 ###
@@ -39,21 +38,21 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NSwicm9sZSI6I
 
 POST http://localhost:5000/api/sessions
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzQ4MTk0Njg3LCJleHAiOjE3NDgxOTgyODd9.HusQm2PbKjf9yyc5tZ7m3xTebZAmD0vmJCx_h-9t9J8
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Niwicm9sZSI6IiIsImlhdCI6MTc0ODE5ODg3MywiZXhwIjoxNzQ4MjAyNDczfQ.NSTnj-DbwiINZGu9uEoMl4tHMtyLkbIuDOvtNanaCIc
 
 {
-  "user_id": 1,
-  "computer_id": 1,
+  "user_id": 2,
+  "computer_id": 3,
   "duration": 2,
-  "payment_method": "offline"
+  "payment_method": "online"
 }
 
 ###
 
 ### SELESAIKAN SESI (finish session)
-PATCH http://localhost:5000/api/sessions/1/finish
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzQ4MTk0Njg3LCJleHAiOjE3NDgxOTgyODd9.HusQm2PbKjf9yyc5tZ7m3xTebZAmD0vmJCx_h-9t9J8
+PATCH http://localhost:5000/api/sessions/2/finish
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Niwicm9sZSI6IiIsImlhdCI6MTc0ODE5ODg3MywiZXhwIjoxNzQ4MjAyNDczfQ.NSTnj-DbwiINZGu9uEoMl4tHMtyLkbIuDOvtNanaCIc
 
 ### LIHAT SEMUA TRANSAKSI
 GET http://localhost:5000/api/transactions
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzQ4MTk0Njg3LCJleHAiOjE3NDgxOTgyODd9.HusQm2PbKjf9yyc5tZ7m3xTebZAmD0vmJCx_h-9t9J8
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzQ4MjA0NzY5LCJleHAiOjE3NDgyMDgzNjl9.VlL26i2w38cv_C4Qu6rol26IZIVUrAThTC3TcwSmkKw

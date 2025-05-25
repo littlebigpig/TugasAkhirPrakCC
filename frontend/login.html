@@ -77,29 +77,59 @@
       });
   
       // Form submission handler
-      document.getElementById('loginForm').addEventListener('submit', function(e) {
-        e.preventDefault();
+      document.getElementById('loginForm').addEventListener('submit', async function(e) {
+        e.preventDefault(); // Prevent default form submission
+        
         const username = document.getElementById('username').value;
         const password = document.getElementById('password').value;
-  
+
         if (username.trim() === '' || password.trim() === '') {
           alert('Harap isi semua field!');
           return;
         }
-  
+
         const loginButton = document.querySelector('.login-button');
         const originalText = loginButton.textContent;
-  
+
         loginButton.textContent = 'Sedang masuk...';
         loginButton.disabled = true;
-  
-        setTimeout(() => {
-          loginButton.textContent = originalText;
-          loginButton.disabled = false;
-          alert('Login berhasil! Selamat datang di WarnetSkarngAph');
-        }, 1500);
+
+        try {
+            // Send login request to backend
+            const response = await fetch('http://localhost:5000/api/auth/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ username, password })
+            });
+
+            const result = await response.json();
+
+            console.log(result);
+
+            if (response.status === 200) {
+                // Save the JWT token in localStorage
+                localStorage.setItem('authToken', result.accessToken);
+
+                // Check user role and redirect accordingly
+                if (result.role === 'admin') {
+                    window.location.href = '/frontend/homeAdmin.html'; // Redirect to admin dashboard
+                } else {
+                    window.location.href = '/frontend/homeUser.html'; // Redirect to user home page
+                }
+            } else {
+                alert(result.message || 'Login gagal!');
+            }
+        } catch (error) {
+            console.error('Error during login:', error);
+            alert('Terjadi kesalahan. Silakan coba lagi.');
+        } finally {
+            // Reset the button after the process
+            loginButton.textContent = originalText;
+            loginButton.disabled = false;
+        }
       });
-  
     </script>
 </body>
 </html>
