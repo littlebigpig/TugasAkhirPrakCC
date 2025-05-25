@@ -37,3 +37,6 @@ Thumbs.db
 
 # Optional eslint cache
 .eslintcache
+
+# rest
+requests.rest
