@@ -1,0 +1,59 @@
+### Register user baru
+POST http://localhost:5000/api/auth/register
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "admin",
+  "role": "admin"
+}
+
+###
+
+### Login user
+POST http://localhost:5000/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "admin"
+}
+
+###
+
+### Access protected route (ganti TOKEN dengan accessToken hasil login)
+GET http://localhost:5000/api/auth/protected
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NCwicm9sZSI6IiIsImlhdCI6MTc0ODE4NDYxOCwiZXhwIjoxNzQ4MTg4MjE4fQ.OJ5gKY2Y_CBcggpVtcOgRdTGQcNoxIflFIRns5Yo-0I
+
+###
+
+### Logout user (token harus valid)
+POST http://localhost:5000/api/auth/logout
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NCwicm9sZSI6IiIsImlhdCI6MTc0ODE4NDYxOCwiZXhwIjoxNzQ4MTg4MjE4fQ.OJ5gKY2Y_CBcggpVtcOgRdTGQcNoxIflFIRns5Yo-0I
+
+###
+PATCH http://localhost:5000/api/sessions/1/finish
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzQ4MTk0Njg3LCJleHAiOjE3NDgxOTgyODd9.HusQm2PbKjf9yyc5tZ7m3xTebZAmD0vmJCx_h-9t9J8
+
+###
+
+POST http://localhost:5000/api/sessions
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzQ4MTk0Njg3LCJleHAiOjE3NDgxOTgyODd9.HusQm2PbKjf9yyc5tZ7m3xTebZAmD0vmJCx_h-9t9J8
+
+{
+  "user_id": 1,
+  "computer_id": 1,
+  "duration": 2,
+  "payment_method": "offline"
+}
+
+###
+
+### SELESAIKAN SESI (finish session)
+PATCH http://localhost:5000/api/sessions/1/finish
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzQ4MTk0Njg3LCJleHAiOjE3NDgxOTgyODd9.HusQm2PbKjf9yyc5tZ7m3xTebZAmD0vmJCx_h-9t9J8
+
+### LIHAT SEMUA TRANSAKSI
+GET http://localhost:5000/api/transactions
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzQ4MTk0Njg3LCJleHAiOjE3NDgxOTgyODd9.HusQm2PbKjf9yyc5tZ7m3xTebZAmD0vmJCx_h-9t9J8
