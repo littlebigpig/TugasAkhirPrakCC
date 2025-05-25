@@ -39,4 +39,4 @@ Thumbs.db
 .eslintcache
 
 # rest
-requests.rest
+backend/requests.rest
