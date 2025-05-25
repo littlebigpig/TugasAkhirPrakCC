@@ -1,4 +1,4 @@
-const jwt = require('jsonwebtoken');
+import jwt from 'jsonwebtoken';
 
 function verifyToken(req, res, next) {
   const authHeader = req.headers['authorization'];
@@ -9,9 +9,9 @@ function verifyToken(req, res, next) {
   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
     if (err) return res.status(403).json({ message: 'Token tidak valid' });
 
-    req.user = user; // Simpan data user dari token ke request
+    req.user = user;
     next();
   });
 }
 
-module.exports = verifyToken;
+export default verifyToken;

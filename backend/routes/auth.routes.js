@@ -1,20 +1,21 @@
-const express = require('express');
-const router = express.Router();
-const AuthController = require('../controllers/auth.controller');
-const verifyToken = require('../middlewares/auth.middleware');
+import express from 'express';
+import AuthController from '../controllers/auth.controller.js';
+import verifyToken from '../middlewares/auth.middleware.js';
 
-// Register
+const router = express.Router();
+
+// Register route
 router.post('/register', AuthController.register);
 
-// Login
+// Login route
 router.post('/login', AuthController.login);
 
-// Logout (opsional, tergantung implementasi refresh token/session)
-router.post('/logout', AuthController.logout);
+// Logout route
+router.post('/logout', verifyToken, AuthController.logout);
 
-// Verifikasi Token
+// Route protected, contoh tes verifikasi token
 router.get('/protected', verifyToken, (req, res) => {
   res.json({ message: `Halo ${req.user.id}, kamu sudah login!` });
 });
 
-module.exports = router;
+export default router;

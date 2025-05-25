@@ -1,6 +1,6 @@
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const User = require('../models/user.model');
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import User from '../models/user.model.js';
 
 const AuthController = {
   // REGISTER
@@ -47,11 +47,10 @@ const AuthController = {
     }
   },
 
-  // LOGOUT (optional — bisa lebih kompleks jika pakai refresh token atau session)
+  // LOGOUT
   logout: async (req, res) => {
-    // Karena JWT stateless, logout bisa di-handle client-side (hapus token dari localStorage)
     return res.status(200).json({ message: 'Logout berhasil (token dihapus di client)' });
   }
 };
 
-module.exports = AuthController;
+export default AuthController;
