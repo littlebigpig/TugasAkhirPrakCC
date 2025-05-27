@@ -1,6 +1,19 @@
 // Configuration
 const TOTAL_PCS = 30;
 const DEFAULT_STATUS = 'kosong';
+const API_BASE_URL = 'http://localhost:5000/api';
+
+// Status mapping between frontend and backend
+const STATUS_MAPPING = {
+    // Frontend to Backend
+    kosong: 'available',
+    dipakai: 'in_use',
+    perbaikan: 'maintenance',
+    // Backend to Frontend
+    available: 'kosong',
+    in_use: 'dipakai',
+    maintenance: 'perbaikan'
+};
 
 // PC Data Model
 let pcData = [];
@@ -19,24 +32,83 @@ const sortDropdown = document.querySelector('.sort-dropdown');
 let currentPC = null;
 
 // Initialize the application
-function init() {
-    initializePCData();
-    renderPCCards();
-    setupEventListeners();
+async function init() {
+    try {
+        await fetchPCData();
+        renderPCCards();
+        setupEventListeners();
+    } catch (error) {
+        console.error('Failed to initialize:', error);
+        alert('Failed to load PC data. Please try again.');
+    }
 }
 
 document.addEventListener('DOMContentLoaded', init);
 
-function initializePCData() {
-    for (let i = 1; i <= TOTAL_PCS; i++) {
-        pcData.push({
-            id: i,
-            status: DEFAULT_STATUS,
-            username: '',
-            time: ''
+// Fetch PC data from backend
+async function fetchPCData() {
+    try {
+        const token = localStorage.getItem('authToken');
+        if (!token) {
+            window.location.href = '/frontend/login.html';
+            return;
+        }
+
+        const response = await fetch(`${API_BASE_URL}/computers`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
         });
+
+        if (!response.ok) {
+            throw new Error('Failed to fetch PC data');
+        }
+
+        const computers = await response.json();
+        pcData = computers.map(pc => ({
+            id: pc.id,
+            status: STATUS_MAPPING[pc.status] || DEFAULT_STATUS,
+            username: pc.username || '',
+            time: pc.time || ''
+        }));
+        originalPCData = [...pcData];
+    } catch (error) {
+        console.error('Error fetching PC data:', error);
+        throw error;
     }
-    originalPCData = [...pcData]; // Simpan salinan data asli
+}
+
+// Update PC status in backend
+async function updatePCStatus(pcId, status, username = '', time = '') {
+    try {
+        const token = localStorage.getItem('authToken');
+        if (!token) {
+            window.location.href = '/frontend/login.html';
+            return;
+        }
+
+        const response = await fetch(`${API_BASE_URL}/computers/${pcId}/status`, {
+            method: 'PATCH',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                status: STATUS_MAPPING[status],
+                username,
+                time
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to update PC status');
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error('Error updating PC status:', error);
+        throw error;
+    }
 }
 
 function renderPCCards() {
@@ -177,46 +249,51 @@ function timeToMs(timeStr) {
     return (h * 3600 + m * 60 + s) * 1000;
 }
 
-function setStatus(status) {
+async function setStatus(status) {
     if (!currentPC) return;
 
-    // This is the first declaration of pcIndex
     const pcIndex = pcData.findIndex(pc => pc.id === currentPC);
     if (pcIndex === -1) return;
 
-    const pc = pcData[pcIndex];
-    
-    switch(status) {
-        case 'kosong':
-            pc.status = 'kosong';
-            pc.username = '';
-            pc.time = '';
-            break;
-        case 'dipakai':
-            pc.status = 'dipakai';
-            pc.username = usernameInput.value.trim() || 'Guest';
-            pc.time = getBillingTime();
-            break;
-        case 'perbaikan':
-            pc.status = 'perbaikan';
-            pc.username = '';
-            pc.time = '';
-            break;
-        case 'stop':
-            pc.status = 'kosong';
-            pc.username = '';
-            pc.time = '';
-            break;
-    }
-    
-    // Just reuse the variable or use a different name
-    const originalIndex = originalPCData.findIndex(pc => pc.id === currentPC);
-    if (originalIndex !== -1) {
-        originalPCData[originalIndex] = {...pcData.find(pc => pc.id === currentPC)};
-    }
+    try {
+        const pc = pcData[pcIndex];
+        let username = '';
+        let time = '';
 
-    renderPCCards();
-    closeModal();
+        switch(status) {
+            case 'kosong':
+                break;
+            case 'dipakai':
+                username = usernameInput.value.trim() || 'Guest';
+                time = getBillingTime();
+                break;
+            case 'perbaikan':
+                break;
+            case 'stop':
+                status = 'kosong';
+                break;
+        }
+
+        // Update backend first
+        await updatePCStatus(currentPC, status, username, time);
+
+        // If backend update successful, update frontend
+        pc.status = status;
+        pc.username = username;
+        pc.time = time;
+
+        // Update original data
+        const originalIndex = originalPCData.findIndex(p => p.id === currentPC);
+        if (originalIndex !== -1) {
+            originalPCData[originalIndex] = {...pcData[pcIndex]};
+        }
+
+        renderPCCards();
+        closeModal();
+    } catch (error) {
+        console.error('Error setting status:', error);
+        alert('Failed to update PC status. Please try again.');
+    }
 }
 
 function formatTime(ms) {
