@@ -81,34 +81,38 @@ async function fetchPCData() {
     try {
         const token = localStorage.getItem('authToken');
         if (!token) {
-            window.location.href = '/frontend/login.html';
+            console.error('Token not found. Redirecting to login.');
+            window.location.href = '/login.html';
             return;
         }
 
+        console.log('Fetching PC data with token:', token); // Debug log
+        console.log('API URL:', `${API_BASE_URL}/computers`); // Debug log
+
         const response = await fetch(`${API_BASE_URL}/computers`, {
             headers: {
-                'Authorization': `Bearer ${token}`
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
             }
         });
 
+        console.log('Response status:', response.status); // Debug log
+
         if (!response.ok) {
-            throw new Error('Failed to fetch PC data');
+            const errorData = await response.json();
+            console.error('Error response from backend:', errorData); // Debug log
+            throw new Error(errorData.message || 'Failed to fetch PC data');
         }
 
         const computers = await response.json();
+        console.log('Received computers:', computers); // Debug log
+
         pcData = computers.map(pc => ({
             id: pc.id,
             status: STATUS_MAPPING[pc.status] || DEFAULT_STATUS,
             username: pc.username || '',
             time: pc.time || ''
         }));
-
-        // Initialize timers for in-use PCs
-        pcData.forEach(pc => {
-            if (pc.status === 'dipakai' && pc.time && !pcTimers.has(pc.id)) {
-                pcTimers.set(pc.id, calculateEndTime(pc.time));
-            }
-        });
 
         originalPCData = [...pcData];
     } catch (error) {
