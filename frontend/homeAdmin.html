@@ -17,6 +17,7 @@
         <option value="perbaikan">Perbaikan</option>
         <option value="time">Billing</option>
     </select>
+      <button class="btn btn-secondary" id="usersBtn">Users</button>
       <button class="btn btn-secondary" id="historyBtn">History</button>
       <button class="btn btn-secondary" id="logoutBtn">Log out</button>
     </div>
@@ -66,6 +67,10 @@
     // (Optional) History button handler
     document.getElementById('historyBtn').onclick = function() {
       window.location.href = 'historyAdmin.html';
+    };
+
+    document.getElementById('usersBtn').onclick = function() {
+      window.location.href = 'users.html';
     };
   </script>
 </body>
