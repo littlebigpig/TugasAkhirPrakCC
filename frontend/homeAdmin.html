@@ -62,6 +62,8 @@
     // Logout functionality
     document.getElementById('logoutBtn').onclick = function() {
       localStorage.removeItem('authToken');
+      localStorage.removeItem('userInfo');
+      localStorage.removeItem('authToken');
       window.location.href = 'login.html';
     };
     // (Optional) History button handler

@@ -238,6 +238,7 @@
         });
 
         document.getElementById('logoutBtn').addEventListener('click', () => {
+            localStorage.removeItem('userInfo');
             localStorage.removeItem('authToken');
             window.location.href = 'login.html';
         });
