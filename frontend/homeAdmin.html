@@ -17,8 +17,8 @@
         <option value="perbaikan">Perbaikan</option>
         <option value="time">Billing</option>
     </select>
-      <button class="btn btn-secondary">History</button>
-      <button class="btn btn-secondary">Log out</button>
+      <button class="btn btn-secondary" id="historyBtn">History</button>
+      <button class="btn btn-secondary" id="logoutBtn">Log out</button>
     </div>
   </header>
 
@@ -57,5 +57,16 @@
   </div>
 
   <script src="card.js"></script>
+  <script>
+    // Logout functionality
+    document.getElementById('logoutBtn').onclick = function() {
+      localStorage.removeItem('authToken');
+      window.location.href = 'login.html';
+    };
+    // (Optional) History button handler
+    document.getElementById('historyBtn').onclick = function() {
+      window.location.href = 'history.html';
+    };
+  </script>
 </body>
 </html>

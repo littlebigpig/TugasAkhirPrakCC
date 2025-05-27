@@ -56,3 +56,8 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Niwicm9sZSI6I
 ### LIHAT SEMUA TRANSAKSI
 GET http://localhost:5000/api/transactions
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzQ4MjA0NzY5LCJleHAiOjE3NDgyMDgzNjl9.VlL26i2w38cv_C4Qu6rol26IZIVUrAThTC3TcwSmkKw
+
+###
+
+GET http://localhost:5000/api/computers
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzQ4MzYwMzIyLCJleHAiOjE3NDgzNjM5MjJ9.D2_utX6k-l5U9gT00dx7uAyaQ8wly4qtik95WgJeBsw
