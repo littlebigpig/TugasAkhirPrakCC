@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken';
+import cors from 'cors';
 
 function verifyToken(req, res, next) {
   const authHeader = req.headers['authorization'];
@@ -13,5 +14,11 @@ function verifyToken(req, res, next) {
     next();
   });
 }
+
+app.use(cors({
+    origin: ['http://localhost:3000', 'https://projek-fe-870764645625.us-central1.run.app'], // Tambahkan domain frontend Anda
+    methods: ['GET', 'POST', 'PATCH', 'DELETE'],
+    credentials: true
+}));
 
 export default verifyToken;
