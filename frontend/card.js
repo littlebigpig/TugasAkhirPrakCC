@@ -19,6 +19,9 @@ const STATUS_MAPPING = {
 let pcData = [];
 let originalPCData = [];
 
+// Store end times for each PC
+const pcTimers = new Map();
+
 // DOM Elements
 const pcGrid = document.getElementById('pcGrid');
 const pcModal = document.getElementById('pcModal');
@@ -71,6 +74,14 @@ async function fetchPCData() {
             username: pc.username || '',
             time: pc.time || ''
         }));
+
+        // Initialize timers for in-use PCs
+        pcData.forEach(pc => {
+            if (pc.status === 'dipakai' && pc.time && !pcTimers.has(pc.id)) {
+                pcTimers.set(pc.id, calculateEndTime(pc.time));
+            }
+        });
+
         originalPCData = [...pcData];
     } catch (error) {
         console.error('Error fetching PC data:', error);
@@ -151,9 +162,15 @@ function createPCCard(pc) {
         usernameElement.style.display = 'block';
         
         if (pc.time) {
-            const durationMs = timeToMs(pc.time);
             timerElement.style.display = 'block';
-            startCountdown(card, durationMs);
+            if (!pcTimers.has(pc.id)) {
+                // Only set new end time if it doesn't exist
+                pcTimers.set(pc.id, calculateEndTime(pc.time));
+            }
+            const remainingMs = pcTimers.get(pc.id) - Date.now();
+            if (remainingMs > 0) {
+                startCountdown(card, remainingMs);
+            }
         }
     }
 
@@ -249,6 +266,12 @@ function timeToMs(timeStr) {
     return (h * 3600 + m * 60 + s) * 1000;
 }
 
+// Calculate end time from time string
+function calculateEndTime(timeStr) {
+    const durationMs = timeToMs(timeStr);
+    return Date.now() + durationMs;
+}
+
 async function setStatus(status) {
     if (!currentPC) return;
 
@@ -304,27 +327,51 @@ function formatTime(ms) {
     return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
 }
 
-function startCountdown(cardElement, durationMs) {
+async function startCountdown(cardElement, durationMs) {
     const timerElement = cardElement.querySelector('.card-timer');
-    const endTime = Date.now() + durationMs;
+    const pcId = parseInt(cardElement.dataset.id);
+    
+    // Get or set end time
+    let endTime;
+    if (pcTimers.has(pcId)) {
+        endTime = pcTimers.get(pcId);
+    } else {
+        endTime = Date.now() + durationMs;
+        pcTimers.set(pcId, endTime);
+    }
 
     if (cardElement.dataset.intervalId) {
         clearInterval(cardElement.dataset.intervalId);
     }
 
-    const intervalId = setInterval(() => {
+    const intervalId = setInterval(async () => {
         const remaining = endTime - Date.now();
         if (remaining <= 0) {
             clearInterval(intervalId);
             timerElement.textContent = '00:00:00';
+            pcTimers.delete(pcId); // Remove timer state
             
-            const pcId = parseInt(cardElement.dataset.id);
-            const pcIndex = pcData.findIndex(pc => pc.id === pcId);
-            if (pcIndex !== -1) {
-                pcData[pcIndex].status = 'kosong';
-                pcData[pcIndex].username = '';
-                pcData[pcIndex].time = '';
+            try {
+                // Update backend status
+                await updatePCStatus(pcId, 'kosong');
+                
+                // Update frontend data
+                const pcIndex = pcData.findIndex(pc => pc.id === pcId);
+                if (pcIndex !== -1) {
+                    pcData[pcIndex].status = 'kosong';
+                    pcData[pcIndex].username = '';
+                    pcData[pcIndex].time = '';
+                    
+                    // Update original data
+                    const originalIndex = originalPCData.findIndex(p => p.id === pcId);
+                    if (originalIndex !== -1) {
+                        originalPCData[originalIndex] = {...pcData[pcIndex]};
+                    }
+                }
                 renderPCCards();
+            } catch (error) {
+                console.error('Error updating PC status after timer ended:', error);
+                alert('Failed to update PC status automatically. Please refresh the page.');
             }
             return;
         }

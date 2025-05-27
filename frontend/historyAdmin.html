@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WarnetSkarngApi - Transaction History</title>
+    <link rel="stylesheet" href="admin_style.css"/>
+</head>
+<body>
+    <div class="container">
+        <header class="header fade-in">
+            <div class="logo">WarnetSkarngApi</div>
+            <nav class="nav-buttons">
+                <a href="/frontend/homeAdmin.html" button class="btn btn-secondary" id="btn-home">Home</a>
+                <button class="btn btn-secondary" id="logoutBtn">Log out</button>
+            </nav>
+        </header>
+
+        <main class="table-container fade-in">
+            <div class="table-header">
+                <h2>Transaction History</h2>
+            </div>
+            
+            <div class="table-wrapper">
+                <table class="table" id="transactionTable">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Username</th>
+                            <th>PC Number</th>
+                            <th>Duration</th>
+                            <th>Payment Method</th>
+                            <th>Date</th>
+                            <th>Total</th>
+                            <th class="action-cell">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="transactionTableBody">
+                        <!-- Data will be populated here -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div id="noData" class="no-data" style="display: none;">
+                <p>No transactions found</p>
+            </div>
+        </main>
+    </div>
+
+    <!-- Delete confirmation modal -->
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Confirm Deletion</h3>
+                <button class="close-btn" onclick="closeDeleteModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete this transaction record?</p>
+                <p class="text-muted">This action cannot be undone.</p>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closeDeleteModal()">Cancel</button>
+                <button class="btn btn-stop" id="confirmDeleteBtn">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:5000/api';
+        let transactions = [];
+        let currentDeleteId = null;
+
+        // Fetch transactions from backend
+        async function fetchTransactions() {
+            try {
+                const token = localStorage.getItem('authToken');
+                if (!token) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                console.log('Fetching transactions...');
+                const response = await fetch(`${API_BASE_URL}/transactions`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    console.error('Server error:', errorData);
+                    throw new Error(errorData.message || 'Failed to fetch transactions');
+                }
+
+                const data = await response.json();
+                console.log('Received transactions:', data);
+                transactions = data;
+                return data;
+            } catch (error) {
+                console.error('Error fetching transactions:', error);
+                alert('Failed to load transactions. Please try again.');
+            }
+        }
+
+        // Format date
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('id-ID', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        // Format currency
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('id-ID', {
+                style: 'currency',
+                currency: 'IDR'
+            }).format(amount);
+        }
+
+        // Render transactions table
+        function renderTransactions(data) {
+            const tbody = document.getElementById('transactionTableBody');
+            const table = document.getElementById('transactionTable');
+            const noData = document.getElementById('noData');
+            tbody.innerHTML = '';
+
+            if (!data || data.length === 0) {
+                table.style.display = 'none';
+                noData.style.display = 'block';
+                return;
+            }
+
+            data.forEach((transaction, index) => {
+                try {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${index + 1}</td>
+                        <td>${transaction.Session?.User?.username || 'Unknown'}</td>
+                        <td>PC ${transaction.Session?.computer_number || 'N/A'}</td>
+                        <td>${transaction.Session?.duration || 'N/A'}</td>
+                        <td>
+                            <span class="status-badge ${transaction.payment_method?.toLowerCase() === 'online' ? 'status-online' : 'status-offline'}">
+                                ${transaction.payment_method || 'N/A'}
+                            </span>
+                        </td>
+                        <td>${transaction.paid_at ? formatDate(transaction.paid_at) : 'N/A'}</td>
+                        <td class="currency">${formatCurrency(transaction.total_payment || 0)}</td>
+                        <td class="action-cell">
+                            <button class="btn-delete" onclick="showDeleteModal(${transaction.id})">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z"/>
+                                </svg>
+                            </button>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                } catch (error) {
+                    console.error('Error rendering transaction:', transaction, error);
+                }
+            });
+
+            table.style.display = 'table';
+            noData.style.display = 'none';
+        }
+
+        // Load and display transactions
+        async function loadTransactions() {
+            const data = await fetchTransactions();
+            renderTransactions(data);
+        }
+
+        // Delete functionality
+        function showDeleteModal(id) {
+            currentDeleteId = id;
+            document.getElementById('deleteModal').classList.add('active');
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').classList.remove('active');
+            currentDeleteId = null;
+        }
+
+        async function deleteTransaction(id) {
+            try {
+                const token = localStorage.getItem('authToken');
+                const response = await fetch(`${API_BASE_URL}/transactions/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to delete transaction');
+                }
+
+                transactions = transactions.filter(t => t.id !== id);
+                renderTransactions(transactions);
+                closeDeleteModal();
+            } catch (error) {
+                console.error('Error deleting transaction:', error);
+                alert('Failed to delete transaction. Please try again.');
+            }
+        }
+
+        // Event Listeners
+        document.getElementById('confirmDeleteBtn').addEventListener('click', () => {
+            if (currentDeleteId) {
+                deleteTransaction(currentDeleteId);
+            }
+        });
+
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            localStorage.removeItem('authToken');
+            window.location.href = 'login.html';
+        });
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', loadTransactions);
+    </script>
+
+    <style>
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .table-header h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-white);
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            border-radius: 15px;
+            box-shadow: var(--shadow-md);
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-muted);
+            background: var(--light-gray);
+            border-radius: 15px;
+            margin-top: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .table-header {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+    </style>
+</body>
+</html>

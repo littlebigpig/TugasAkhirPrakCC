@@ -1,5 +1,6 @@
 import Transaction from '../models/transaction.model.js';
 import Session from '../models/session.model.js';
+import User from '../models/user.model.js';
 
 const TransactionController = {
   // Buat transaksi baru (biasanya saat sesi mulai)
@@ -31,7 +32,16 @@ const TransactionController = {
   // List semua transaksi (admin)
   getAllTransactions: async (req, res) => {
     try {
-      const transactions = await Transaction.findAll({ include: Session });
+      const transactions = await Transaction.findAll({
+        include: [{
+          model: Session,
+          include: [{
+            model: User,
+            attributes: ['username']
+          }]
+        }],
+        order: [['paid_at', 'DESC']]
+      });
       res.json(transactions);
     } catch (error) {
       res.status(500).json({ message: 'Gagal mengambil transaksi', error: error.message });

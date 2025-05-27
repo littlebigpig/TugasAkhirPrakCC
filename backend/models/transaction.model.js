@@ -29,7 +29,15 @@ const Transaction = db.define('transactions', {
   timestamps: false,
 });
 
-// Relasi
-Transaction.belongsTo(Session, { foreignKey: 'session_id' });
+// Relasi dengan include User
+Transaction.belongsTo(Session, { 
+  foreignKey: 'session_id',
+  include: [
+    {
+      model: Session,
+      include: ['User', 'Computer']
+    }
+  ]
+});
 
 export default Transaction;
