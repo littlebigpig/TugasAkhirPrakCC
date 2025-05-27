@@ -1,7 +1,7 @@
 // Configuration
 const TOTAL_PCS = 30;
 const DEFAULT_STATUS = 'kosong';
-const API_BASE_URL = 'http://localhost:5000/api';
+const API_BASE_URL = 'https://projek-be-870764645625.us-central1.run.app/api';
 
 // Status mapping between frontend and backend
 const STATUS_MAPPING = {
