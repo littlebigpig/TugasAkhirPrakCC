@@ -26,7 +26,7 @@
                     <thead>
                         <tr>
                             <th>No</th>
-                            <th>Username</th>
+                            <th>User ID</th>
                             <th>PC Number</th>
                             <th>Duration</th>
                             <th>Payment Method</th>
@@ -93,7 +93,19 @@
                 }
 
                 const data = await response.json();
-                console.log('Received transactions:', data);
+                console.log('Raw transaction data from server:', data);
+
+                if (Array.isArray(data)) {
+                    data.forEach((transaction, index) => {
+                        console.log(`Transaction ${index + 1}:`, {
+                            id: transaction.id,
+                            username: transaction.user_id,
+                            computer_number: transaction.computer_number,
+                            duration: transaction.duration
+                        });
+                    });
+                }
+
                 transactions = data;
                 return data;
             } catch (error) {
@@ -135,14 +147,16 @@
                 return;
             }
 
+            console.log('Rendering transactions:', data); // Debug log
+
             data.forEach((transaction, index) => {
                 try {
                     const row = document.createElement('tr');
                     row.innerHTML = `
                         <td>${index + 1}</td>
-                        <td>${transaction.Session?.User?.username || 'Unknown'}</td>
-                        <td>PC ${transaction.Session?.computer_number || 'N/A'}</td>
-                        <td>${transaction.Session?.duration || 'N/A'}</td>
+                        <td>${transaction.user_id || 'Admin'}</td>
+                        <td>${transaction.computer_number ? 'PC ' + transaction.computer_number : 'N/A'}</td>
+                        <td>${formatDuration(transaction.duration)}</td>
                         <td>
                             <span class="status-badge ${transaction.payment_method?.toLowerCase() === 'online' ? 'status-online' : 'status-offline'}">
                                 ${transaction.payment_method || 'N/A'}
@@ -166,6 +180,14 @@
 
             table.style.display = 'table';
             noData.style.display = 'none';
+        }
+
+        // Format duration from minutes to readable format
+        function formatDuration(minutes) {
+            if (!minutes) return 'N/A';
+            const hours = Math.floor(minutes / 60);
+            const remainingMinutes = minutes % 60;
+            return `${hours}:${String(remainingMinutes).padStart(2, '0')}`;
         }
 
         // Load and display transactions

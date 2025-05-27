@@ -20,6 +20,18 @@ const Transaction = db.define('transactions', {
     type: DataTypes.ENUM('offline', 'online'),
     defaultValue: 'online',
   },
+  username: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  pcnumber: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  duration: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+  },
   paid_at: {
     type: DataTypes.DATE,
     defaultValue: DataTypes.NOW,
@@ -29,15 +41,7 @@ const Transaction = db.define('transactions', {
   timestamps: false,
 });
 
-// Relasi dengan include User
-Transaction.belongsTo(Session, { 
-  foreignKey: 'session_id',
-  include: [
-    {
-      model: Session,
-      include: ['User', 'Computer']
-    }
-  ]
-});
+// Simple association - the includes will be handled in the controller
+Transaction.belongsTo(Session, { foreignKey: 'session_id' });
 
 export default Transaction;

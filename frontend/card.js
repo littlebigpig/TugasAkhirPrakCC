@@ -22,6 +22,30 @@ let originalPCData = [];
 // Store end times for each PC
 const pcTimers = new Map();
 
+// Save PC state to localStorage
+function savePCState() {
+    const state = {
+        pcData: pcData,
+        timers: Array.from(pcTimers.entries())
+    };
+    localStorage.setItem('pcState', JSON.stringify(state));
+}
+
+// Load PC state from localStorage
+function loadPCState() {
+    const savedState = localStorage.getItem('pcState');
+    if (savedState) {
+        const state = JSON.parse(savedState);
+        pcData = state.pcData;
+        pcTimers.clear();
+        state.timers.forEach(([id, endTime]) => {
+            pcTimers.set(parseInt(id), endTime);
+        });
+        return true;
+    }
+    return false;
+}
+
 // DOM Elements
 const pcGrid = document.getElementById('pcGrid');
 const pcModal = document.getElementById('pcModal');
@@ -37,11 +61,11 @@ let currentPC = null;
 // Initialize the application
 async function init() {
     try {
-        // Debug: Check stored data
-        console.log('Stored authToken:', localStorage.getItem('authToken'));
-        console.log('Stored userInfo:', localStorage.getItem('userInfo'));
-
-        await fetchPCData();
+        // Try to load saved state first
+        if (!loadPCState()) {
+            // If no saved state, fetch from backend
+            await fetchPCData();
+        }
         renderPCCards();
         setupEventListeners();
     } catch (error) {
@@ -119,7 +143,9 @@ async function updatePCStatus(pcId, status, username = '', time = '') {
             throw new Error('Failed to update PC status');
         }
 
-        return await response.json();
+        const result = await response.json();
+        savePCState(); // Save state after successful update
+        return result;
     } catch (error) {
         console.error('Error updating PC status:', error);
         throw error;
@@ -294,36 +320,6 @@ async function setStatus(status) {
                 username = usernameInput.value.trim() || 'Guest';
                 time = getBillingTime();
 
-                // Debug logging
-                console.log('Current localStorage:', {
-                    authToken: localStorage.getItem('authToken'),
-                    userInfo: localStorage.getItem('userInfo')
-                });
-
-                // Get user info from localStorage with error handling
-                let userInfo;
-                try {
-                    const userInfoStr = localStorage.getItem('userInfo');
-                    console.log('userInfoStr:', userInfoStr); // Debug log
-                    
-                    if (!userInfoStr) {
-                        throw new Error('No user info found');
-                    }
-                    
-                    userInfo = JSON.parse(userInfoStr);
-                    console.log('Parsed userInfo:', userInfo); // Debug log
-                    
-                    if (!userInfo || !userInfo.id) {
-                        throw new Error('Invalid user info');
-                    }
-                } catch (error) {
-                    console.error('Error parsing user info:', error);
-                    // Instead of redirecting immediately, show what's wrong
-                    alert(`Session error: ${error.message}\nStored data: ${localStorage.getItem('userInfo')}`);
-                    window.location.href = '/frontend/login.html';
-                    return;
-                }
-
                 // Create new session
                 const sessionResponse = await fetch(`${API_BASE_URL}/sessions`, {
                     method: 'POST',
@@ -332,10 +328,11 @@ async function setStatus(status) {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        user_id: userInfo.id,
+                        user_id: JSON.parse(localStorage.getItem('userInfo')).id,
                         computer_id: currentPC,
-                        duration: time,
-                        payment_method: 'offline' // Add payment method if required
+                        duration: timeToMinutes(time),
+                        payment_method: 'offline',
+                        username: username
                     })
                 });
 
@@ -344,8 +341,6 @@ async function setStatus(status) {
                     throw new Error(errorData.message || 'Failed to create session');
                 }
 
-                // Log the response for debugging
-                console.log('Session created:', await sessionResponse.json());
                 break;
             case 'perbaikan':
                 break;
@@ -367,12 +362,19 @@ async function setStatus(status) {
             originalPCData[originalIndex] = {...pcData[pcIndex]};
         }
 
+        savePCState(); // Save state after updates
         renderPCCards();
         closeModal();
     } catch (error) {
         console.error('Error setting status:', error);
         alert(error.message || 'Failed to update PC status. Please try again.');
     }
+}
+
+// Convert time string to minutes
+function timeToMinutes(timeStr) {
+    const [hours, minutes, seconds] = timeStr.split(':').map(Number);
+    return hours * 60 + minutes + (seconds > 0 ? 1 : 0);
 }
 
 function formatTime(ms) {
@@ -387,13 +389,13 @@ async function startCountdown(cardElement, durationMs) {
     const timerElement = cardElement.querySelector('.card-timer');
     const pcId = parseInt(cardElement.dataset.id);
     
-    // Get or set end time
     let endTime;
     if (pcTimers.has(pcId)) {
         endTime = pcTimers.get(pcId);
     } else {
         endTime = Date.now() + durationMs;
         pcTimers.set(pcId, endTime);
+        savePCState(); // Save state when setting new timer
     }
 
     if (cardElement.dataset.intervalId) {
@@ -405,25 +407,24 @@ async function startCountdown(cardElement, durationMs) {
         if (remaining <= 0) {
             clearInterval(intervalId);
             timerElement.textContent = '00:00:00';
-            pcTimers.delete(pcId); // Remove timer state
+            pcTimers.delete(pcId);
+            savePCState(); // Save state when timer ends
             
             try {
-                // Update backend status
                 await updatePCStatus(pcId, 'kosong');
                 
-                // Update frontend data
                 const pcIndex = pcData.findIndex(pc => pc.id === pcId);
                 if (pcIndex !== -1) {
                     pcData[pcIndex].status = 'kosong';
                     pcData[pcIndex].username = '';
                     pcData[pcIndex].time = '';
                     
-                    // Update original data
                     const originalIndex = originalPCData.findIndex(p => p.id === pcId);
                     if (originalIndex !== -1) {
                         originalPCData[originalIndex] = {...pcData[pcIndex]};
                     }
                 }
+                savePCState(); // Save state after updates
                 renderPCCards();
             } catch (error) {
                 console.error('Error updating PC status after timer ended:', error);

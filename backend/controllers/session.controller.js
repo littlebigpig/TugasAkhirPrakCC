@@ -6,7 +6,7 @@ import Transaction from "../models/transaction.model.js";
 const SessionController = {
   // Mulai sesi baru
   startSession: async (req, res) => {
-    const { user_id, computer_id, duration } = req.body;
+    const { user_id, computer_id, duration, username } = req.body;
 
     if (!user_id || !computer_id || !duration) {
       return res
@@ -51,7 +51,10 @@ const SessionController = {
       const transaction = await Transaction.create({
         session_id: session.id,
         total_payment: cost,
-        payment_method: req.body.payment_method || "offline", // sesuaikan input
+        payment_method: req.body.payment_method || "offline",
+        username: username || "Guest", // Save the username to transaction
+        pcnumber: computer.name, // Save the PC number
+        duration: duration // Save the duration
       });
 
       res.status(201).json({ message: "Sesi baru dimulai", session });

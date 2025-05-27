@@ -1,6 +1,7 @@
 import Transaction from '../models/transaction.model.js';
 import Session from '../models/session.model.js';
 import User from '../models/user.model.js';
+import Computer from '../models/computer.model.js';
 
 const TransactionController = {
   // Buat transaksi baru (biasanya saat sesi mulai)
@@ -32,18 +33,45 @@ const TransactionController = {
   // List semua transaksi (admin)
   getAllTransactions: async (req, res) => {
     try {
+      console.log('Fetching transactions with associations...');
+      
       const transactions = await Transaction.findAll({
         include: [{
           model: Session,
-          include: [{
-            model: User,
-            attributes: ['username']
-          }]
+          required: true,
+          include: [
+            {
+              model: User,
+              required: true,
+              attributes: ['id']
+            }
+          ]
         }],
         order: [['paid_at', 'DESC']]
       });
-      res.json(transactions);
+
+      console.log('Raw transactions:', JSON.stringify(transactions, null, 2));
+
+      // Transform data for frontend
+      const transformedTransactions = transactions.map(transaction => {
+        const session = transaction.Session;
+        
+        return {
+          id: transaction.id,
+          user_id: transaction.username || 'Admin',
+          computer_number: transaction.pcnumber || 'N/A',
+          duration: transaction.duration || 0,
+          payment_method: transaction.payment_method,
+          paid_at: transaction.paid_at,
+          total_payment: transaction.total_payment,
+          session_status: session?.status || 'unknown'
+        };
+      });
+
+      console.log('Transformed transactions:', JSON.stringify(transformedTransactions, null, 2));
+      res.json(transformedTransactions);
     } catch (error) {
+      console.error('Error in getAllTransactions:', error);
       res.status(500).json({ message: 'Gagal mengambil transaksi', error: error.message });
     }
   },
@@ -62,8 +90,5 @@ const TransactionController = {
     }     
   }
 };
-
-
-
 
 export default TransactionController;
