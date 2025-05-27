@@ -47,6 +47,23 @@ const TransactionController = {
       res.status(500).json({ message: 'Gagal mengambil transaksi', error: error.message });
     }
   },
+
+  deleteTransaction: async (req, res) => {
+    const { id } = req.params;
+
+    try {
+      const transaction = await Transaction.findByPk(id);
+      if (!transaction) return res.status(404).json({ message: 'Transaksi tidak ditemukan' });
+
+      await transaction.destroy();
+      res.status(200).json({ message: 'Transaksi berhasil dihapus' });
+    } catch (error) {
+      res.status(500).json({ message: 'Gagal menghapus transaksi', error: error.message });
+    }     
+  }
 };
+
+
+
 
 export default TransactionController;

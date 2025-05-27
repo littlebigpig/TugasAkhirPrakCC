@@ -45,10 +45,13 @@ const AuthController = {
       // Send token and role in response
       res.status(200).json({
         message: 'Login berhasil',
-        accessToken,
-        role: user.role  // Include role in the response
+        id: user.id,  // Important: Include this!
+        username: user.username,
+        role: user.role,  // Include role in the response
+        accessToken
       });
     } catch (err) {
+      console.error('Login error:', err);
       res.status(500).json({ message: 'Gagal login', error: err.message });
     }
   },

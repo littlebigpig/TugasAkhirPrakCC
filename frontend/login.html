@@ -78,56 +78,51 @@
   
       // Form submission handler
       document.getElementById('loginForm').addEventListener('submit', async function(e) {
-        e.preventDefault(); // Prevent default form submission
+        e.preventDefault();
         
-        const username = document.getElementById('username').value;
-        const password = document.getElementById('password').value;
-
-        if (username.trim() === '' || password.trim() === '') {
-          alert('Harap isi semua field!');
-          return;
-        }
-
-        const loginButton = document.querySelector('.login-button');
-        const originalText = loginButton.textContent;
-
-        loginButton.textContent = 'Sedang masuk...';
-        loginButton.disabled = true;
-
         try {
-            // Send login request to backend
             const response = await fetch('http://localhost:5000/api/auth/login', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
+                    'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ username, password })
+                body: JSON.stringify({
+                    username: document.getElementById('username').value,
+                    password: document.getElementById('password').value
+                })
             });
 
             const result = await response.json();
-
-            console.log(result);
-
-            if (response.status === 200) {
-                // Save the JWT token in localStorage
+            
+            if (response.ok) {
+                // Store complete user info
+                const userInfo = {
+                    id: result.id,          // Make sure these fields match
+                    username: result.username,
+                    role: result.role
+                };
+                
+                // Debug log
+                console.log('Login response:', result);
+                console.log('Storing userInfo:', userInfo);
+                
                 localStorage.setItem('authToken', result.accessToken);
-
-                // Check user role and redirect accordingly
-                if (result.role === 'admin') {
-                    window.location.href = '/frontend/homeAdmin.html'; // Redirect to admin dashboard
+                localStorage.setItem('userInfo', JSON.stringify(userInfo));
+                
+                // Verify storage
+                console.log('Stored userInfo:', localStorage.getItem('userInfo'));
+                
+                if (userInfo.role === 'admin') {
+                    window.location.href = 'homeAdmin.html';
                 } else {
-                    window.location.href = '/frontend/homeUser.html'; // Redirect to user home page
+                    window.location.href = 'homeUser.html';
                 }
             } else {
-                alert(result.message || 'Login gagal!');
+                alert(result.message || 'Login failed');
             }
         } catch (error) {
-            console.error('Error during login:', error);
-            alert('Terjadi kesalahan. Silakan coba lagi.');
-        } finally {
-            // Reset the button after the process
-            loginButton.textContent = originalText;
-            loginButton.disabled = false;
+            console.error('Login error:', error);
+            alert('Login failed. Please try again.');
         }
       });
     </script>

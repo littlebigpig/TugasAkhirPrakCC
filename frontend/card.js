@@ -37,6 +37,10 @@ let currentPC = null;
 // Initialize the application
 async function init() {
     try {
+        // Debug: Check stored data
+        console.log('Stored authToken:', localStorage.getItem('authToken'));
+        console.log('Stored userInfo:', localStorage.getItem('userInfo'));
+
         await fetchPCData();
         renderPCCards();
         setupEventListeners();
@@ -289,6 +293,59 @@ async function setStatus(status) {
             case 'dipakai':
                 username = usernameInput.value.trim() || 'Guest';
                 time = getBillingTime();
+
+                // Debug logging
+                console.log('Current localStorage:', {
+                    authToken: localStorage.getItem('authToken'),
+                    userInfo: localStorage.getItem('userInfo')
+                });
+
+                // Get user info from localStorage with error handling
+                let userInfo;
+                try {
+                    const userInfoStr = localStorage.getItem('userInfo');
+                    console.log('userInfoStr:', userInfoStr); // Debug log
+                    
+                    if (!userInfoStr) {
+                        throw new Error('No user info found');
+                    }
+                    
+                    userInfo = JSON.parse(userInfoStr);
+                    console.log('Parsed userInfo:', userInfo); // Debug log
+                    
+                    if (!userInfo || !userInfo.id) {
+                        throw new Error('Invalid user info');
+                    }
+                } catch (error) {
+                    console.error('Error parsing user info:', error);
+                    // Instead of redirecting immediately, show what's wrong
+                    alert(`Session error: ${error.message}\nStored data: ${localStorage.getItem('userInfo')}`);
+                    window.location.href = '/frontend/login.html';
+                    return;
+                }
+
+                // Create new session
+                const sessionResponse = await fetch(`${API_BASE_URL}/sessions`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        user_id: userInfo.id,
+                        computer_id: currentPC,
+                        duration: time,
+                        payment_method: 'offline' // Add payment method if required
+                    })
+                });
+
+                if (!sessionResponse.ok) {
+                    const errorData = await sessionResponse.json();
+                    throw new Error(errorData.message || 'Failed to create session');
+                }
+
+                // Log the response for debugging
+                console.log('Session created:', await sessionResponse.json());
                 break;
             case 'perbaikan':
                 break;
@@ -297,15 +354,14 @@ async function setStatus(status) {
                 break;
         }
 
-        // Update backend first
+        // Update PC status
         await updatePCStatus(currentPC, status, username, time);
 
-        // If backend update successful, update frontend
+        // Update frontend
         pc.status = status;
         pc.username = username;
         pc.time = time;
 
-        // Update original data
         const originalIndex = originalPCData.findIndex(p => p.id === currentPC);
         if (originalIndex !== -1) {
             originalPCData[originalIndex] = {...pcData[pcIndex]};
@@ -315,7 +371,7 @@ async function setStatus(status) {
         closeModal();
     } catch (error) {
         console.error('Error setting status:', error);
-        alert('Failed to update PC status. Please try again.');
+        alert(error.message || 'Failed to update PC status. Please try again.');
     }
 }
 
