@@ -8,11 +8,15 @@ const router = express.Router();
 router.use(verifyToken);
 
 // Buat transaksi baru
-router.post('/', TransactionController.createTransaction);
+router.post('/', TransactionController.createTransaction); // Create
 
-// List semua transaksi
-router.get('/', checkAdmin, TransactionController.getAllTransactions);
+// Read transaksi berdasarkan ID
+router.get('/:id', verifyToken, TransactionController.getTransactionById); // Read
 
-router.delete('/:id', checkAdmin, TransactionController.deleteTransaction);
+// Update transaksi
+router.patch('/:id', checkAdmin, TransactionController.updateTransaction); // Update
+
+// Hapus transaksi
+router.delete('/:id', checkAdmin, TransactionController.deleteTransaction); // Delete
 
 export default router;
