@@ -76,42 +76,6 @@ const TransactionController = {
     }
   },
 
-  // Mengambil transaksi berdasarkan ID
-  getTransactionById: async (req, res) => {
-    const { id } = req.params;
-
-    try {
-      const transaction = await Transaction.findByPk(id, {
-        include: [Session] // Sertakan model Session jika diperlukan
-      });
-      if (!transaction) return res.status(404).json({ message: 'Transaksi tidak ditemukan' });
-
-      res.json(transaction);
-    } catch (error) {
-      res.status(500).json({ message: 'Gagal mengambil transaksi', error: error.message });
-    }
-  },
-
-  // Memperbarui transaksi
-  updateTransaction: async (req, res) => {
-    const { id } = req.params;
-    const { total_payment, payment_method } = req.body;
-
-    try {
-      const transaction = await Transaction.findByPk(id);
-      if (!transaction) return res.status(404).json({ message: 'Transaksi tidak ditemukan' });
-
-      // Update hanya jika ada nilai baru
-      if (total_payment !== undefined) transaction.total_payment = total_payment;
-      if (payment_method !== undefined) transaction.payment_method = payment_method;
-
-      await transaction.save();
-      res.json({ message: 'Transaksi berhasil diperbarui', transaction });
-    } catch (error) {
-      res.status(500).json({ message: 'Gagal memperbarui transaksi', error: error.message });
-    }
-  },
-
   deleteTransaction: async (req, res) => {
     const { id } = req.params;
 
