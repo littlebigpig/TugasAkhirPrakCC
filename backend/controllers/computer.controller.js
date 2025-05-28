@@ -1,56 +1,56 @@
 import Computer from '../models/computer.model.js';
 
 const ComputerController = {
-  // Create Computer
-  createComputer: async (req, res) => {
+  // Get semua komputer
+  getAllComputers: async (req, res) => {
     try {
-      const { id, status } = req.body;
-      const computer = await Computer.create({ id, status });
-      res.status(201).json({ message: 'Computer created successfully', computer });
+      const computers = await Computer.findAll();
+      res.json(computers);
     } catch (error) {
-      console.error('Error creating computer:', error);
-      res.status(500).json({ message: 'Failed to create computer', error: error.message });
+      res.status(500).json({ message: 'Gagal mengambil data komputer', error: error.message });
     }
   },
 
-  // Read Computer by ID
-  getComputerById: async (req, res) => {
+  // Update status komputer (misal maintenance, in_use, available)
+  updateStatus: async (req, res) => {
+    const { id } = req.params;
+    const { status, username, time } = req.body;
+
+    if (!['available', 'in_use', 'maintenance'].includes(status)) {
+      return res.status(400).json({ message: 'Status komputer tidak valid' });
+    }
+
     try {
-      const computer = await Computer.findByPk(req.params.id);
-      if (!computer) return res.status(404).json({ message: 'Computer not found' });
-      res.status(200).json(computer);
+      const computer = await Computer.findByPk(id);
+      if (!computer) return res.status(404).json({ message: 'Komputer tidak ditemukan' });
+
+      computer.status = status;
+      computer.username = username || null;
+      computer.time = time || null;
+      
+      await computer.save();
+
+      res.json({ message: 'Status komputer berhasil diupdate', computer });
     } catch (error) {
-      console.error('Error fetching computer:', error);
-      res.status(500).json({ message: 'Failed to fetch computer', error: error.message });
+      res.status(500).json({ message: 'Gagal update status komputer', error: error.message });
     }
   },
 
-  // Update Computer
-  updateComputer: async (req, res) => {
+  // Optional: tambah komputer baru
+  addComputer: async (req, res) => {
+    const { name } = req.body;
+    if (!name) return res.status(400).json({ message: 'Nama komputer wajib diisi' });
+
     try {
-      const { status } = req.body;
-      const computer = await Computer.findByPk(req.params.id);
-      if (!computer) return res.status(404).json({ message: 'Computer not found' });
-
-      await computer.update({ status });
-      res.status(200).json({ message: 'Computer updated successfully', computer });
+      const newComputer = await Computer.create({ 
+        name,
+        status: 'available',
+        username: null,
+        time: null
+      });
+      res.status(201).json({ message: 'Komputer baru berhasil ditambahkan', computer: newComputer });
     } catch (error) {
-      console.error('Error updating computer:', error);
-      res.status(500).json({ message: 'Failed to update computer', error: error.message });
-    }
-  },
-
-  // Delete Computer
-  deleteComputer: async (req, res) => {
-    try {
-      const computer = await Computer.findByPk(req.params.id);
-      if (!computer) return res.status(404).json({ message: 'Computer not found' });
-
-      await computer.destroy();
-      res.status(200).json({ message: 'Computer deleted successfully' });
-    } catch (error) {
-      console.error('Error deleting computer:', error);
-      res.status(500).json({ message: 'Failed to delete computer', error: error.message });
+      res.status(500).json({ message: 'Gagal tambah komputer', error: error.message });
     }
   }
 };

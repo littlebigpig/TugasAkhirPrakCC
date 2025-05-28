@@ -7,16 +7,13 @@ const router = express.Router();
 
 router.use(verifyToken);
 
-// Create
-router.post('/', SessionController.startSession); 
+// Mulai sesi baru
+router.post('/', SessionController.startSession);
 
-// Read
-router.get('/:id', verifyToken, SessionController.getSessionById); 
+// List semua sesi
+router.get('/', checkAdmin, SessionController.getAllSessions);
 
-// Update
-router.patch('/:id', checkAdmin, SessionController.updateSession); 
-
-// Delete
-router.delete('/:id', checkAdmin, SessionController.deleteSession); 
+// Selesaikan sesi
+router.patch('/:id/finish', SessionController.finishSession);
 
 export default router;

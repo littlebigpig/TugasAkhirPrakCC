@@ -61,57 +61,35 @@ const AuthController = {
     return res.status(200).json({ message: 'Logout berhasil (token dihapus di client)' });
   },
 
-  // Create User
-  createUser: async (req, res) => {
+  getAllUsers: async (req, res) => {
     try {
-      const { username, password, role } = req.body;
-      const hashedPassword = bcrypt.hashSync(password, 10);
-      const user = await User.create({ username, password: hashedPassword, role });
-      res.status(201).json({ message: 'User created successfully', user });
-    } catch (error) {
-      console.error('Error creating user:', error);
-      res.status(500).json({ message: 'Failed to create user', error: error.message });
+        const users = await User.findAll({
+            attributes: ['id', 'username', 'role'] // Only return necessary fields
+        });
+        res.status(200).json(users);
+    } catch (err) {
+        console.error('Error fetching users:', err);
+        res.status(500).json({ message: 'Gagal mengambil data user', error: err.message });
     }
   },
 
-  // Read User by ID
-  getUserById: async (req, res) => {
-    try {
-      const user = await User.findByPk(req.params.id, { attributes: ['id', 'username', 'role'] });
-      if (!user) return res.status(404).json({ message: 'User not found' });
-      res.status(200).json(user);
-    } catch (error) {
-      console.error('Error fetching user:', error);
-      res.status(500).json({ message: 'Failed to fetch user', error: error.message });
-    }
-  },
-
-  // Update User
-  updateUser: async (req, res) => {
-    try {
-      const { username, role } = req.body;
-      const user = await User.findByPk(req.params.id);
-      if (!user) return res.status(404).json({ message: 'User not found' });
-
-      await user.update({ username, role });
-      res.status(200).json({ message: 'User updated successfully', user });
-    } catch (error) {
-      console.error('Error updating user:', error);
-      res.status(500).json({ message: 'Failed to update user', error: error.message });
-    }
-  },
-
-  // Delete User
   deleteUser: async (req, res) => {
+    const { id } = req.params;
+
     try {
-      const user = await User.findByPk(req.params.id);
-      if (!user) return res.status(404).json({ message: 'User not found' });
+      const user = await User.findByPk(id);
+      if (!user) return res.status(404).json({ message: 'User tidak ditemukan' });
+
+      // Prevent deletion of admin user
+      if (user.role === 'admin') {
+        return res.status(403).json({ message: 'Tidak dapat menghapus user admin' });
+      }
 
       await user.destroy();
-      res.status(200).json({ message: 'User deleted successfully' });
-    } catch (error) {
-      console.error('Error deleting user:', error);
-      res.status(500).json({ message: 'Failed to delete user', error: error.message });
+      res.status(200).json({ message: 'User berhasil dihapus' });
+    } catch (err) {
+      console.error('Error deleting user:', err);
+      res.status(500).json({ message: 'Gagal menghapus user', error: err.message });
     }
   }
 };
